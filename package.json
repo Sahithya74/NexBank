@@ -1,0 +1,18 @@
+{
+  "name": "nexbank",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NexBank - online banking SaaS platform (React, Node.js/Express, MySQL)",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "db:setup": "npm run db:setup --prefix server",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix client",
+    "start": "npm start --prefix server"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
