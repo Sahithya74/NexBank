@@ -80,8 +80,9 @@ async function rateTable(base) {
 
   return currencies.map((currency) => {
     const quoteRate = rates.get(currency.code);
+    // How much of `base` one unit of this currency is worth.
     const rate = quoteRate
-      ? money.fromScaled(money.divideScaled(money.toScaled(quoteRate), money.toScaled(baseRate)), 8)
+      ? money.fromScaled(money.divideScaled(money.toScaled(baseRate), money.toScaled(quoteRate)), 8)
       : null;
     return { ...currency, base, rate };
   });

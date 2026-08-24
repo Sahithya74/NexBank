@@ -48,6 +48,7 @@ function toDTO(row) {
   return {
     id: row.id,
     reference: row.reference,
+    userId: row.user_id,
     productId: row.product_id,
     productName: row.product_name,
     principal: String(row.principal),
