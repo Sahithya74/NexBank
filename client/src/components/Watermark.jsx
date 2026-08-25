@@ -2,7 +2,7 @@
 export default function Watermark({ variant = 'default', className = '' }) {
   return (
     <p className={`watermark ${variant === 'aside' ? 'watermark--aside' : ''} ${className}`}>
-      Designed and Developed by Sahithya K.
+      Designed & Developed by Sahithya K
     </p>
   );
 }
