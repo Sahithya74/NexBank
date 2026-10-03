@@ -17,7 +17,7 @@ function randomSuffix(length = 6) {
 /**
  * Human-readable reference, e.g. TRF20260825K7QM2X.
  * Prefixes: TXN transaction, TRF transfer, CNV conversion, BPY bill payment,
- * LON loan, LPY loan payment.
+ * LON loan, LPY loan payment, DEP deposit.
  */
 function generateReference(prefix) {
   const now = new Date();

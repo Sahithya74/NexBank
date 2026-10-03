@@ -49,6 +49,9 @@ const config = {
 
   /** Currency used when a portfolio total is requested without an explicit base. */
   baseCurrency: process.env.BASE_CURRENCY || 'INR',
+
+  /** INR demo credit placed in every newly opened wallet so conversion can be tried. 0 disables it. */
+  walletOpeningCredit: process.env.WALLET_OPENING_CREDIT || '1000.00',
 };
 
 module.exports = config;

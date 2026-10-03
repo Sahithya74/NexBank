@@ -1,5 +1,6 @@
 'use strict';
 
+const config = require('../config/env');
 const { query, queryOne, withTransaction } = require('../config/db');
 const { badRequest, notFound, conflict } = require('../utils/AppError');
 const { generateReference } = require('../utils/reference');
@@ -9,7 +10,10 @@ const currencyService = require('./currencyService');
 const auditService = require('./auditService');
 const notificationService = require('./notificationService');
 
-/** Fetch the user's wallet, creating it (with a base-currency balance) on first use. */
+/**
+ * Fetch the user's wallet, creating it on first use with an INR balance holding
+ * the configured demo opening credit (recorded in the ledger as a deposit).
+ */
 async function ensureWallet(userId, connection = null) {
   const exec = connection
     ? (sql, params) => connection.execute(sql, params).then(([rows]) => rows)
@@ -19,11 +23,25 @@ async function ensureWallet(userId, connection = null) {
   if (existing.length) return existing[0];
 
   if (connection) {
+    const openingCredit = money.compare(config.walletOpeningCredit, '0') > 0
+      ? money.normaliseAmount(config.walletOpeningCredit, { decimals: 2, label: 'Opening credit' })
+      : '0';
+
     const [result] = await connection.execute('INSERT INTO wallets (user_id) VALUES (?)', [userId]);
     await connection.execute(
-      'INSERT INTO wallet_balances (wallet_id, currency_code, balance) VALUES (?, ?, 0)',
-      [result.insertId, 'INR'],
+      'INSERT INTO wallet_balances (wallet_id, currency_code, balance) VALUES (?, ?, ?)',
+      [result.insertId, 'INR', openingCredit],
     );
+
+    if (money.compare(openingCredit, '0') > 0) {
+      await connection.execute(
+        `INSERT INTO transactions
+           (reference, user_id, wallet_id, type, direction, description, amount, currency_code, balance_after, status)
+         VALUES (?, ?, ?, 'deposit', 'credit', 'Wallet opening demo credit', ?, 'INR', ?, 'completed')`,
+        [generateReference('DEP'), userId, result.insertId, openingCredit, openingCredit],
+      );
+    }
+
     return { id: result.insertId, user_id: userId, status: 'active' };
   }
 
