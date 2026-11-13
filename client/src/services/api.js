@@ -7,6 +7,8 @@
  */
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
+/** True only in the read-only GitHub Pages build (vite build --mode pages). */
+export const DEMO_MODE = import.meta.env.MODE === 'pages';
 const TOKEN_KEY = 'nexbank.token';
 
 export class ApiError extends Error {
@@ -59,9 +61,7 @@ function buildQuery(params) {
   return query ? `?${query}` : '';
 }
 
-async function request(method, path, { body, params, signal } = {}) {
-  const token = tokenStore.get();
-
+async function fetchFromServer(method, path, { body, params, signal, token }) {
   let response;
   try {
     response = await fetch(`${BASE_URL}${path}${buildQuery(params)}`, {
@@ -81,29 +81,42 @@ async function request(method, path, { body, params, signal } = {}) {
     );
   }
 
-  if (response.status === 204) return null;
+  if (response.status === 204) return { status: 204, payload: null };
 
-  let payload;
   try {
-    payload = await response.json();
+    return { status: response.status, payload: await response.json() };
   } catch {
     throw new ApiError('We received an unexpected response from the server.', {
       code: 'INVALID_RESPONSE',
       status: response.status,
     });
   }
+}
 
-  if (!response.ok || payload.success === false) {
+/** The static Pages build has no server: it answers from a bundled snapshot. */
+async function answerFromDemo(method, path, options) {
+  const { respond } = await import('./demoApi');
+  return respond(method, path, options);
+}
+
+async function request(method, path, { body, params, signal } = {}) {
+  const token = tokenStore.get();
+  const send = DEMO_MODE ? answerFromDemo : fetchFromServer;
+  const { status, payload } = await send(method, path, { body, params, signal, token });
+
+  if (status === 204) return null;
+
+  if (status < 200 || status >= 300 || payload.success === false) {
     const error = payload.error || {};
 
-    if (response.status === 401) {
+    if (status === 401) {
       tokenStore.clear();
       onSessionExpired(error.code === 'SESSION_EXPIRED');
     }
 
     throw new ApiError(error.message || 'Something went wrong. Please try again.', {
       code: error.code || 'REQUEST_FAILED',
-      status: response.status,
+      status,
       details: error.details || null,
     });
   }

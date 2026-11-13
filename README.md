@@ -5,6 +5,10 @@ loans and full role-based administration, built on React, Node.js/Express and My
 
 > Designed and Developed by **Sahithya K.**
 
+**Live demo:** https://sahithya74.github.io/NexBank/ — sign in with any demo account
+below (password `Password@123`). The demo is a read-only snapshot: every page can be
+browsed, but transfers, payments and other changes need the full stack running locally.
+
 ---
 
 ## Overview
@@ -248,6 +252,22 @@ All demo accounts use the password **`Password@123`**.
 | Bank employee | `employee@nexbank.com` |
 | Customer | `meera@nexbank.com` |
 | Customer | `arjun@nexbank.com` |
+
+### GitHub Pages demo
+
+GitHub Pages serves static files only, so the hosted demo runs without the API.
+It answers from a snapshot of the real API bundled into the build: lists are
+filtered, sorted and paged in the browser, and anything that would change data is
+refused with a read-only message.
+
+```bash
+npm start                  # the API must be running with the seed data loaded
+npm run demo:snapshot      # writes client/src/demo/snapshot.json
+npm run build:pages        # builds client/dist for https://sahithya74.github.io/NexBank/
+```
+
+Publish `client/dist` to the `gh-pages` branch. The normal `npm run build` does not
+include the snapshot.
 
 ---
 

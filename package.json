@@ -9,7 +9,9 @@
     "dev:server": "npm run dev --prefix server",
     "dev:client": "npm run dev --prefix client",
     "build": "npm run build --prefix client",
-    "start": "npm start --prefix server"
+    "start": "npm start --prefix server",
+    "demo:snapshot": "npm run demo:snapshot --prefix server",
+    "build:pages": "npm run build:pages --prefix client"
   },
   "engines": {
     "node": ">=18"

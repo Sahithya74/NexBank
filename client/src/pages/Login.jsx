@@ -7,6 +7,7 @@ import { InlineAlert } from '../components/States';
 import UserAvatar from '../components/UserAvatar';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { DEMO_MODE } from '../services/api';
 
 const DEMO_ACCOUNTS = [
   { role: 'Administrator', email: 'admin@nexbank.com' },
@@ -123,6 +124,11 @@ export default function Login() {
 
       <div className="demo-accounts">
         <p className="demo-accounts__title">Demo accounts · password Password@123</p>
+        {DEMO_MODE ? (
+          <p style={{ margin: '0 0 8px', fontSize: 12, color: 'var(--muted)' }}>
+            Read-only demo: browse every page freely; transfers, payments and other changes are switched off.
+          </p>
+        ) : null}
         {DEMO_ACCOUNTS.map((account) => (
           <button
             key={account.email}

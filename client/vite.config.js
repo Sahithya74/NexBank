@@ -1,8 +1,10 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
+  // `--mode pages` builds the read-only demo served from GitHub Pages at /NexBank/.
+  base: mode === 'pages' ? '/NexBank/' : '/',
   server: {
     port: 5173,
     proxy: {
@@ -25,4 +27,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));
